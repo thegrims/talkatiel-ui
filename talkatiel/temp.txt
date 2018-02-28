@@ -1,0 +1,19 @@
+constructor(props) {
+  super(props);
+  this.state = {
+    text: 'Useless Multiline Placeholder',
+};
+<myTextInput
+  multiline = {true}
+  numberOfLines = {4}
+  onChangeText={(text) => this.setState({text})}
+  value={this.state.text}
+/>
+
+
+<Text h2>Heading 2</Text>
+// <Text style={{marginBottom: 10}}>
+//   The idea with React Native Elements is more about component structure than actual design.
+// </Text>
+
+        <Badge onPress={() => {console.log('pressed')}} value="5" />
