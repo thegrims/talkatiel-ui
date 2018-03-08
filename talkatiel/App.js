@@ -4,30 +4,52 @@ const users = [
     avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
  },
 ]
+const axios = require("axios");
+const url = "http://aidangrimshaw.pythonanywhere.com/Posts/New";
+// const url = "http://aidangrimshaw.pythonanywhere.com/Posts/New";
+
 import { StyleSheet, View } from 'react-native';
 import React, { Component } from 'react';
 import { AppRegistry, Image, TextInput, Alert} from 'react-native';
-import { Badge, Text, Button, Card, ButtonGroup, Header } from 'react-native-elements'
+import { Badge, Text, Button, Card, ButtonGroup, Header, List, ListItem } from 'react-native-elements'
 import {ScrollView} from 'react-native-gesture-handler';
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
 
 export default class App extends React.Component {
+  // componentDidMount() {
+  //   console.log("starting")
+  //   axios
+  //     .get(url)
+  //     .then(response => {
+  //       for (i = 0; i < response.data.length; i++){
+  //         console.log(response.data[i].title);
+  //         console.log(response.data[i].content);
+  //         console.log(response.data[i].upvotes - response.data[i].downvotes);
+  //       }
+  //   })
+  //   .catch(error => {
+  //     console.log(error);
+  //   });
+  // }
   render() {
     return (
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Header
+          backgroundColor='#03A9F4'
           leftComponent={{ icon: 'menu', color: '#fff' }}
-          centerComponent={{ text: 'TalkaTiel', style: { color: '#fff' } }}
-          rightComponent={{ icon: 'home', color: '#fff' }}
+          centerComponent={{ text: 'TalkaTiel', style: { color: '#fff', fontSize: 25 } }}
+          rightComponent={{ icon: 'create', color: '#fff' }}
         />
-        <BadgeButton/>
-        <BadgeButton/>
-        <BadgeButton/>
-        <BadgeButton/>
-        <BadgeButton/>
-        <BadgeButton/>
-        <BadgeButton/>
+        <Test><BadgeButton/></Test>
+
       </ScrollView>
+
+      // <BadgeButton/>
+      // <BadgeButton/>
+      // <BadgeButton/>
+      // <BadgeButton/>
+      // <BadgeButton/>
+      // <BadgeButton/>
     // <View style={{
     //   flex: 1,
     //   flexDirection: 'column',
@@ -43,6 +65,56 @@ export default class App extends React.Component {
     );
   }
 }
+class Test extends Component {
+  constructor(props) {
+        super(props);
+        this.state = {
+          list: [],
+          title: "...",
+          content: "...",
+          upvotes: "",
+          downvotes: ""
+        };
+  }
+  render() {
+    var postNames = ['test','firstPost','secondPost']
+    return (
+      <View>
+        <BadgeButton
+          title={this.state.title}
+          content={this.state.content}
+          upvotes={this.state.upvotes}
+        />
+        <Button
+          icon={{name: 'refresh'}}
+          backgroundColor='#03A9F4'
+          buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+          onPress={ () => this.componentDidMount() }
+        />
+      </View>
+    );
+  }
+  componentDidMount = () => {
+    axios
+      .get(url)
+      .then(response => {
+        for (i = 0; i < response.data.length; i++){
+          // this.setState({list: this.state.list.concat([response.data[i]])});
+          this.setState({
+              title: response.data[i].title,
+              content: response.data[i].content,
+              upvotes: response.data[i].upvotes
+          })
+          console.log(response.data[i].title);
+          console.log(response.data[i].content);
+          console.log(response.data[i].upvotes - response.data[i].downvotes);
+        }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+}
 class MyTextInput extends Component {
   render() {
     return (
@@ -56,7 +128,7 @@ class MyTextInput extends Component {
     );
   }
 }
-export class BadgeButton extends Component {
+class BadgeButton extends Component {
   constructor (props) {
     super(props);
     this.state = {
@@ -65,40 +137,53 @@ export class BadgeButton extends Component {
     };
   }
   render() {
-    const buttons = ['Upvote', 'Downvote']
-    const backgroundColor = ['#03A9F4', '#03A9F4']
-    const { selectedIndex } = this.state
+    // const buttons = ['Upvote', 'Downvote']
+    // const backgroundColor = ['#03A9F4', '#03A9F4']
+    // const { selectedIndex } = this.state
     return (
       <View>
-        <Card title="Post Name">
-          <Badge
-            value={this.state.upvotes}
-            textStyle={{ color: 'orange' }}
-            containerStyle={{width: 50}}
-          />
-          <Button
-            icon={{name: 'code'}}
-            backgroundColor='#03A9F4'
-            buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-            title='Upvote'
-            onPress={this._addNum}
-          />
-          <ButtonGroup
-            onPress={this.updateIndex}
-            selectedIndex={this.state.index}
-            buttons={buttons}
-            containerStyle={{height: 30}}
-            onPress={this._addNum}
-          />
-          <AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
+        <Card
+          title={this.props.title}
+          titleStyle={{fontSize: 25, color: '#03A9F4'}}
+          containerStyle={{marginBottom: 15}}
+        >
+        <Text h5
+        style={{marginBottom:15 }}
+        >{this.props.content}</Text>
+
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+            <Button
+              icon={{name: 'thumb-up', raised: true }}
+              backgroundColor='#03A9F4'
+              buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+              onPress={this._addNum}
+            />
+            <Button
+              title='50'//{this.props.upvotes}
+              loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
+              backgroundColor='#f4c703'
+              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+            />
+            <Button
+              icon={{name: 'thumb-down'}}
+              backgroundColor='#f44e03'
+              buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+              onPress={this._addNum}
+            />
+          </View>
         </Card>
       </View>
     );
   }
   _addNum = () => {
-    this.setState({
-        upvotes: this.state.upvotes + 1,
+    axios
+      .get(url)
+      .then(response => {
+
     })
+    .catch(error => {
+      console.log(error);
+    });
   }
   updateIndex = (index) => {
      this.setState({index})

@@ -17,3 +17,20 @@ constructor(props) {
 // </Text>
 
         <Badge onPress={() => {console.log('pressed')}} value="5" />
+
+  <ButtonGroup
+    onPress={this.updateIndex}
+    selectedIndex={this.state.index}
+    buttons={buttons}
+    containerStyle={{height: 30}}
+    onPress={this._addNum}
+  />
+
+<AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
+
+<Badge
+  value={this.props.upvotes}
+  textStyle={{ color: 'orange' }}
+  badgeStyle={{ marginBottom: 5 }}
+  containerStyle={{width: 50}}
+/>
