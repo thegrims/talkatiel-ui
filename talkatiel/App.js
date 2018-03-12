@@ -1,9 +1,17 @@
-const users = [
- {
-    name: 'brynn',
-    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
- },
+// const users = [
+//  {
+//     name: 'brynn',
+//     avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
+//  },
+// ]
+var post = [
+  {
+    title: '',
+    content: '',
+    upvotes: ''
+  },
 ]
+
 const axios = require("axios");
 const url = "http://aidangrimshaw.pythonanywhere.com/Posts/New";
 // const url = "http://aidangrimshaw.pythonanywhere.com/Posts/New";
@@ -41,7 +49,7 @@ export default class App extends React.Component {
           rightComponent={{ icon: 'create', color: '#fff' }}
         />
         <Test><BadgeButton/></Test>
-
+        <AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
       </ScrollView>
 
       // <BadgeButton/>
@@ -101,6 +109,7 @@ class Test extends Component {
         for (i = 0; i < response.data.length; i++){
           // this.setState({list: this.state.list.concat([response.data[i]])});
           this.setState({
+              list: this.state.list.concat(["adskjdvn"]),
               title: response.data[i].title,
               content: response.data[i].content,
               upvotes: response.data[i].upvotes
