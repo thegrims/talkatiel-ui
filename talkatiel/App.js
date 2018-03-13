@@ -4,17 +4,17 @@
 //     avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
 //  },
 // ]
-var post = [
-  {
-    title: '',
-    content: '',
-    upvotes: ''
-  },
-]
-
+// var post = [
+//   {
+//     title: '',
+//     content: '',
+//     upvotes: ''
+//   },
+// ]
+// <AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
 const axios = require("axios");
-const url = "http://aidangrimshaw.pythonanywhere.com/Posts/New";
-// const url = "http://aidangrimshaw.pythonanywhere.com/Posts/New";
+const url = "http://aidangrimshaw.pythonanywhere.com/Posts/Top";
+const tempUrl = "http://aidangrimshaw.pythonanywhere.com/Posts/";
 
 import { StyleSheet, View } from 'react-native';
 import React, { Component } from 'react';
@@ -24,52 +24,88 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
 
 export default class App extends React.Component {
-  // componentDidMount() {
-  //   console.log("starting")
-  //   axios
-  //     .get(url)
-  //     .then(response => {
-  //       for (i = 0; i < response.data.length; i++){
-  //         console.log(response.data[i].title);
-  //         console.log(response.data[i].content);
-  //         console.log(response.data[i].upvotes - response.data[i].downvotes);
-  //       }
-  //   })
-  //   .catch(error => {
-  //     console.log(error);
-  //   });
-  // }
+  constructor(props) {
+        super(props);
+        this.state = {
+          postPage: false,
+          urlEnd: tempUrl+"New"
+        };
+  }
+  urlHot = () => {
+      this.setState({urlEnd: tempUrl+'Hot'})
+      console.log(this.state.urlEnd+'\n')
+  }
+  urlTop = () => {
+      this.setState({urlEnd: tempUrl+'Top'})
+      console.log(this.state.urlEnd+'\n')
+  }
+  urlNew = () => {
+      this.setState({urlEnd: tempUrl+'New'})
+      console.log(this.state.urlEnd+'\n')
+  }
   render() {
     return (
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Header
           backgroundColor='#03A9F4'
-          leftComponent={{ icon: 'menu', color: '#fff' }}
-          centerComponent={{ text: 'TalkaTiel', style: { color: '#fff', fontSize: 25 } }}
-          rightComponent={{ icon: 'create', color: '#fff' }}
+          leftComponent={{
+            icon: 'menu',
+            color: '#fff',
+            onPress: () => this.setState(previousState => {
+              return { postPage: false };
+            }),
+          }}
+          centerComponent={{
+            text: 'TalkaTiel',
+            style: { color: '#fff', fontSize: 25 },
+            onPress: () => this.setState(previousState => {
+              return { postPage: false };
+            }),
+          }}
+          rightComponent={{
+            icon: 'create',
+            color: '#fff',
+            onPress: () => this.setState(previousState => {
+              return { postPage: true };
+            }),
+          }}
         />
-        <Test><BadgeButton/></Test>
-        <AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
-      </ScrollView>
+        { this.state.postPage &&
+          <CreatePost/>
+        }
+        { !this.state.postPage &&
+          <Card>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+              <Button
+                title='Hot'
+                backgroundColor='#03A9F4'
+                buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+                onPress = { this.urlHot }
+              />
+              <Button
+                title='Top'
+                loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
+                backgroundColor='#f4c703'
+                buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+                onPress = { this.urlTop }
+              />
+              <Button
+                title='New'
+                backgroundColor='#f44e03'
+                buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+                onPress={() => this.urlNew("blah") }
+              />
+            </View>
+          </Card>
+        }
 
-      // <BadgeButton/>
-      // <BadgeButton/>
-      // <BadgeButton/>
-      // <BadgeButton/>
-      // <BadgeButton/>
-      // <BadgeButton/>
-    // <View style={{
-    //   flex: 1,
-    //   flexDirection: 'column',
-    //   justifyContent: 'center',
-    //   alignItems: 'center',
-    // }}>
-    //    <View style={{flex: 1, backgroundColor: 'powderblue'}} >
-    //    <Text>Open up App.js to start working on your app!</Text>
-    //    </View>
-    //    <View style={{flex: 2, backgroundColor: 'skyblue'}} />
-    //    <View style={{flex: 3, backgroundColor: 'steelblue'}} />
-    //  </View>
+        { !this.state.postPage &&
+          <Test
+            url={this.state.urlEnd}
+          >
+          <BadgeButton/></Test>
+        }
+      </ScrollView>
     );
   }
 }
@@ -77,22 +113,16 @@ class Test extends Component {
   constructor(props) {
         super(props);
         this.state = {
-          list: [],
-          title: "...",
-          content: "...",
-          upvotes: "",
-          downvotes: ""
+          list: []
         };
   }
   render() {
     var postNames = ['test','firstPost','secondPost']
     return (
       <View>
-        <BadgeButton
-          title={this.state.title}
-          content={this.state.content}
-          upvotes={this.state.upvotes}
-        />
+        {
+          this.renderButtons()
+        }
         <Button
           icon={{name: 'refresh'}}
           backgroundColor='#03A9F4'
@@ -107,21 +137,35 @@ class Test extends Component {
       .get(url)
       .then(response => {
         for (i = 0; i < response.data.length; i++){
-          // this.setState({list: this.state.list.concat([response.data[i]])});
+          let post = [
+            {
+              "title" : response.data[i].title,
+              "content" : response.data[i].content,
+              "upvotes" : (response.data[i].upvotes - response.data[i].downvotes).toString(),
+            },
+          ];
           this.setState({
-              list: this.state.list.concat(["adskjdvn"]),
-              title: response.data[i].title,
-              content: response.data[i].content,
-              upvotes: response.data[i].upvotes
+              list: this.state.list.concat(post),
           })
-          console.log(response.data[i].title);
-          console.log(response.data[i].content);
-          console.log(response.data[i].upvotes - response.data[i].downvotes);
+          // console.log(this.state.list[i]);
+          // console.log(response.data[i].upvotes);
         }
     })
     .catch(error => {
       console.log(error);
     });
+  }
+  renderButtons() {
+      return this.state.list.map((item,key) => {
+          return (
+              <BadgeButton
+                key={key}
+                title={item.title}
+                content={item.content}
+                upvotes={item.upvotes}
+              />
+          );
+      });
   }
 }
 class MyTextInput extends Component {
@@ -137,6 +181,61 @@ class MyTextInput extends Component {
     );
   }
 }
+class CreatePost extends Component {
+  constructor(props) {
+        super(props);
+        this.state = {
+          title: '',
+          content: ''
+        };
+  }
+  uploadPost() {
+    console.log(this.state.content)
+    console.log(this.state.title)
+    axios({
+      method: 'post',
+      url: 'http://aidangrimshaw.pythonanywhere.com/Posts',
+      data: {
+        content: this.state.content,
+        upvotes: 0,
+        downvotes: 0,
+        postID: 2,
+        userID: 1,
+        title: this.state.title
+      }
+    });
+  }
+  render() {
+    return (
+      <View>
+        <Card
+          title={"Create Post"}
+          titleStyle={{fontSize: 25, color: '#03A9F4'}}
+          containerStyle={{marginBottom: 15}}
+        >
+          <Text h4
+          style={{marginBottom:15, color: '#03A9F4' }}
+          >Title</Text>
+
+          <AutoGrowingTextInput style={styles.textInput} placeholder={''} onChangeText={(title) => this.setState({title})}/>
+
+          <Text h4
+          style={{marginBottom:15, color: '#03A9F4' }}
+          >Content</Text>
+
+          <AutoGrowingTextInput style={styles.textInput} placeholder={''} onChangeText={(content) => this.setState({content})}/>
+
+        </Card>
+        <Button
+          title='Submit'
+          backgroundColor='#03A9F4'
+          buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+          onPress={ () => this.uploadPost() }
+        />
+      </View>
+    )
+  }
+}
 class BadgeButton extends Component {
   constructor (props) {
     super(props);
@@ -146,9 +245,6 @@ class BadgeButton extends Component {
     };
   }
   render() {
-    // const buttons = ['Upvote', 'Downvote']
-    // const backgroundColor = ['#03A9F4', '#03A9F4']
-    // const { selectedIndex } = this.state
     return (
       <View>
         <Card
@@ -156,9 +252,9 @@ class BadgeButton extends Component {
           titleStyle={{fontSize: 25, color: '#03A9F4'}}
           containerStyle={{marginBottom: 15}}
         >
-        <Text h5
-        style={{marginBottom:15 }}
-        >{this.props.content}</Text>
+          <Text h5
+          style={{marginBottom:15 }}
+          >{this.props.content}</Text>
 
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
             <Button
@@ -168,7 +264,7 @@ class BadgeButton extends Component {
               onPress={this._addNum}
             />
             <Button
-              title='50'//{this.props.upvotes}
+              title={this.props.upvotes}
               loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
               backgroundColor='#f4c703'
               buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
@@ -198,68 +294,9 @@ class BadgeButton extends Component {
      this.setState({index})
   }
 }
-export class Bananas extends Component {
-  render() {
-    let pic = {
-      uri: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Bananavarieties.jpg'
-    };
-    return (
-      <Image source={pic} style={{width: 193, height: 110}}/>
-    );
-  }
-}
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
+
 const styles = StyleSheet.create({
   contentContainer: {
     paddingVertical: 20
   }
 });
-// import React, { Component } from 'react';
-// import { AppRegistry, View, TextInput } from 'react-native';
-//
-// class UselessTextInput extends Component {
-//   render() {
-//     return (
-//       <TextInput
-//         {...this.props} // Inherit any props passed to it; e.g., multiline, numberOfLines below
-//         editable = {true}
-//         maxLength = {40}
-//       />
-//     );
-//   }
-// }
-//
-// export default class UselessTextInputMultiline extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       text: 'Useless Multiline Placeholder',
-//     };
-//   }
-//
-//   // If you type something in the text box that is a color, the background will change to that
-//   // color.
-//   render() {
-//     return (
-//      <View style={{
-//        backgroundColor: this.state.text,
-//        borderBottomColor: '#000000',
-//        borderBottomWidth: 1 }}
-//      >
-//        <UselessTextInput
-//          multiline = {true}
-//          numberOfLines = {10}
-//          onChangeText={(text) => this.setState({text})}
-//          value={this.state.text}
-//        />
-//      </View>
-//     );
-//   }
-// }
