@@ -3,19 +3,34 @@ const axios = require("axios");
 const url =
   "http://aidangrimshaw.pythonanywhere.com/Posts/New";
 
-axios
-  .get(url)
-  .then(response => {
-    for (i = 0; i < response.data.length; i++){
-      console.log(response.data[i]);
-      console.log(response.data[i].content);
-      console.log(response.data[i].upvotes - response.data[i].downvotes);
-      console.log(response.data[i].postID);
-    }
-  })
-  .catch(error => {
-    console.log(error);
-  });
+// axios
+//   .get(url)
+//   .then(response => {
+//     for (i = 0; i < response.data.length; i++){
+//       console.log(response.data[i]);
+//       console.log(response.data[i].content);
+//       console.log(response.data[i].upvotes - response.data[i].downvotes);
+//       console.log("postID: "+response.data[i].postID);
+//     }
+//   })
+//   .catch(error => {
+//     console.log(error);
+//   });
+
+  axios
+    .get("http://aidangrimshaw.pythonanywhere.com/Posts/2/0")
+    .then(response => {
+      console.log(response.data[i])
+      // for (i = 0; i < response.data.length; i++){
+      //   console.log(response.data[i]);
+      //   console.log(response.data[i].content);
+      //   console.log(response.data[i].upvotes - response.data[i].downvotes);
+      //   console.log(response.data[i].postID);
+      // }
+    })
+    .catch(error => {
+      console.log(error);
+    });
 
 // try {
 //   // Send a POST request

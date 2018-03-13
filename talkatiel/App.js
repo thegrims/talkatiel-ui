@@ -78,13 +78,13 @@ export default class App extends React.Component {
               <Button
                 title='Top'
                 loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
-                backgroundColor='#f4c703'
+                backgroundColor='#03A9F4'
                 buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
                 onPress={() => this.urlChange("Top") }
               />
               <Button
                 title='New'
-                backgroundColor='#f44e03'
+                backgroundColor='#03A9F4'
                 buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
                 onPress={() => this.urlChange("New") }
               />
@@ -140,6 +140,7 @@ class Test extends Component {
               "title" : response.data[i].title,
               "content" : response.data[i].content,
               "upvotes" : (response.data[i].upvotes - response.data[i].downvotes).toString(),
+              "postID" : response.data[i].postID.toString(),
             },
           ];
           this.setState({
@@ -161,6 +162,7 @@ class Test extends Component {
                 title={item.title}
                 content={item.content}
                 upvotes={item.upvotes}
+                postID={item.postID}
               />
           );
       });
@@ -238,9 +240,38 @@ class BadgeButton extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      upvotes: 0,
+      localUpvotes: this.props.upvotes,
+      upVoted: false,
+      downVoted: false,
       selectedIndex: 1
     };
+  }
+  vote(vote) {
+    if (vote == -1 && this.state.downVoted == false){
+      this.setState({
+        localUpvotes: (parseInt(this.state.localUpvotes)+vote).toString(),
+        downVoted: true,
+      })
+    }
+    else if (vote == -1 && this.state.downVoted == true){
+      this.setState({
+        localUpvotes: (parseInt(this.state.localUpvotes)-vote).toString(),
+        downVoted: false,
+      })
+    }
+    else if (vote == 1 && this.state.upVoted == false){
+      this.setState({
+        localUpvotes: (parseInt(this.state.localUpvotes)+vote).toString(),
+        upVoted: true,
+      })
+    }
+    else if (vote == 1 && this.state.upVoted == true){
+      this.setState({
+        localUpvotes: (parseInt(this.state.localUpvotes)-vote).toString(),
+        upVoted: false,
+      })
+    }
+    // console.log(this.props.postID)
   }
   render() {
     return (
@@ -259,37 +290,25 @@ class BadgeButton extends Component {
               icon={{name: 'thumb-up', raised: true }}
               backgroundColor='#03A9F4'
               buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
-              onPress={this._addNum}
+              onPress={() => this.vote(1)}
             />
             <Button
-              title={this.props.upvotes}
+              title={this.state.localUpvotes}
               loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
               backgroundColor='#f4c703'
               buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+              onPress={() => this.vote(5)}
             />
             <Button
               icon={{name: 'thumb-down'}}
               backgroundColor='#f44e03'
               buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
-              onPress={this._addNum}
+              onPress={() => this.vote(-1)}
             />
           </View>
         </Card>
       </View>
     );
-  }
-  _addNum = () => {
-    axios
-      .get(url)
-      .then(response => {
-
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  }
-  updateIndex = (index) => {
-     this.setState({index})
   }
 }
 
