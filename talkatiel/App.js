@@ -31,16 +31,9 @@ export default class App extends React.Component {
           urlEnd: tempUrl+"New"
         };
   }
-  urlHot = () => {
-      this.setState({urlEnd: tempUrl+'Hot'})
-      console.log(this.state.urlEnd+'\n')
-  }
-  urlTop = () => {
-      this.setState({urlEnd: tempUrl+'Top'})
-      console.log(this.state.urlEnd+'\n')
-  }
-  urlNew = () => {
-      this.setState({urlEnd: tempUrl+'New'})
+  urlChange = (type) => {
+      this.setState({urlEnd: tempUrl+type})
+      this.child.componentDidMount(this.state.urlEnd)
       console.log(this.state.urlEnd+'\n')
   }
   render() {
@@ -80,20 +73,20 @@ export default class App extends React.Component {
                 title='Hot'
                 backgroundColor='#03A9F4'
                 buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
-                onPress = { this.urlHot }
+                onPress={() => this.urlChange("Hot") }
               />
               <Button
                 title='Top'
                 loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
                 backgroundColor='#f4c703'
                 buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
-                onPress = { this.urlTop }
+                onPress={() => this.urlChange("Top") }
               />
               <Button
                 title='New'
                 backgroundColor='#f44e03'
                 buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
-                onPress={() => this.urlNew("blah") }
+                onPress={() => this.urlChange("New") }
               />
             </View>
           </Card>
@@ -101,7 +94,8 @@ export default class App extends React.Component {
 
         { !this.state.postPage &&
           <Test
-            url={this.state.urlEnd}
+            ref={instance => { this.child = instance; }}
+            urlEnd={this.state.urlEnd}
           >
           <BadgeButton/></Test>
         }
@@ -127,12 +121,16 @@ class Test extends Component {
           icon={{name: 'refresh'}}
           backgroundColor='#03A9F4'
           buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-          onPress={ () => this.componentDidMount() }
+          onPress={ () => this.componentDidMount(this.props.urlEnd) }
         />
       </View>
     );
   }
-  componentDidMount = () => {
+  componentDidMount = (urlEnd) => {
+    this.setState({
+        list: [],
+    })
+    console.log(urlEnd);
     axios
       .get(url)
       .then(response => {
