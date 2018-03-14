@@ -19,18 +19,31 @@ const tempUrl = "https://aidangrimshaw.pythonanywhere.com/Posts/";
 import { StyleSheet, View } from 'react-native';
 import React, { Component } from 'react';
 import { AppRegistry, Image, TextInput, Alert} from 'react-native';
-import { Badge, Text, Button, Card, ButtonGroup, Header, List, ListItem } from 'react-native-elements'
+import { Badge, Text, Button, Card, ButtonGroup, Header, List, ListItem, Input, Divider } from 'react-native-elements'
 import {ScrollView} from 'react-native-gesture-handler';
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
 
+/**
+ * [handler description]
+ * @type {[type]}
+ */
 export default class App extends React.Component {
   constructor(props) {
         super(props);
+        this.handler = this.handler.bind(this)
         this.state = {
           postPage: false,
           urlEnd: tempUrl+"New"
         };
   }
+  handler(e) {
+   e.preventDefault()
+   this.setState({
+     postPage: true,
+     // urlEnd: tempUrl+"New"
+   })
+   // this.child.componentDidMount(this.state.urlEnd)
+ }
   urlChange = (type) => {
       this.setState({urlEnd: tempUrl+type})
       this.child.componentDidMount(this.state.urlEnd)
@@ -41,6 +54,7 @@ export default class App extends React.Component {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Header
           backgroundColor='#03A9F4'
+          outerContainerStyles={{height: 100, marginBottom: 20}}
           leftComponent={{
             icon: 'menu',
             color: '#fff',
@@ -50,7 +64,7 @@ export default class App extends React.Component {
           }}
           centerComponent={{
             text: 'TalkaTiel',
-            style: { color: '#fff', fontSize: 25 },
+            style: { color: '#fff', fontSize: 35, fontWeight: 'bold' },
             onPress: () => this.setState(previousState => {
               return { postPage: false };
             }),
@@ -64,32 +78,30 @@ export default class App extends React.Component {
           }}
         />
         { this.state.postPage &&
-          <CreatePost/>
+          <CreatePost handler = {this.handler}/>
         }
         { !this.state.postPage &&
-          <Card>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
               <Button
                 title='Hot'
                 backgroundColor='#03A9F4'
-                buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+                buttonStyle={{width: 100, borderWidth: 0, marginRight: -15, borderColor: 'transparent', borderRadius: 0}}
                 onPress={() => this.urlChange("Hot") }
               />
               <Button
                 title='Top'
                 loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
                 backgroundColor='#03A9F4'
-                buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+                buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
                 onPress={() => this.urlChange("Top") }
               />
               <Button
                 title='New'
                 backgroundColor='#03A9F4'
-                buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+                buttonStyle={{width: 100, borderWidth: 0, marginLeft: -15, borderColor: 'transparent', borderRadius: 0}}
                 onPress={() => this.urlChange("New") }
               />
             </View>
-          </Card>
         }
 
         { !this.state.postPage &&
@@ -103,6 +115,10 @@ export default class App extends React.Component {
     );
   }
 }
+/**
+ * [Test description]
+ * @extends Component
+ */
 class Test extends Component {
   constructor(props) {
         super(props);
@@ -168,19 +184,10 @@ class Test extends Component {
       });
   }
 }
-class MyTextInput extends Component {
-  render() {
-    return (
-      <View>
-        <TextInput
-          {...this.props} // Inherit any props passed to it; e.g., multiline, numberOfLines below
-          editable = {true}
-          maxLength = {40}
-        />
-      </View>
-    );
-  }
-}
+/**
+ * [CreatePost description]
+ * @extends Component
+ */
 class CreatePost extends Component {
   constructor(props) {
         super(props);
@@ -214,28 +221,42 @@ class CreatePost extends Component {
           containerStyle={{marginBottom: 15}}
         >
           <Text h4
-          style={{marginBottom:15, color: '#03A9F4' }}
-          >Title</Text>
+          style={{marginBottom:15, color: '#C0C0C0' }}
+          >
+            Title
+          </Text>
 
-          <AutoGrowingTextInput style={styles.textInput} placeholder={''} onChangeText={(title) => this.setState({title})}/>
+          <AutoGrowingTextInput
+            style={{ color: '#C0C0C0', marginTop: 0 }}
+            placeholder={''}
+            onChangeText={(title) => this.setState({title})}
+          />
 
           <Text h4
-          style={{marginBottom:15, color: '#03A9F4' }}
+          style={{marginBottom:15, color: '#C0C0C0' }}
           >Content</Text>
 
-          <AutoGrowingTextInput style={styles.textInput} placeholder={''} onChangeText={(content) => this.setState({content})}/>
+          <AutoGrowingTextInput
+            style={{ color: '#C0C0C0', marginTop: 0 }}
+            placeholder={''}
+            onChangeText={(title) => this.setState({title})}
+          />
 
         </Card>
         <Button
           title='Submit'
           backgroundColor='#03A9F4'
           buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-          onPress={ () => this.uploadPost() }
+          onPress={ () => uploadPost() }
         />
       </View>
     )
   }
 }
+/**
+ * [BadgeButton description]
+ * @extends Component
+ */
 class BadgeButton extends Component {
   constructor (props) {
     super(props);
@@ -243,9 +264,22 @@ class BadgeButton extends Component {
       localUpvotes: this.props.upvotes,
       upVoted: false,
       downVoted: false,
+      comments: false,
       postLink: '',
       selectedIndex: 1
     };
+  }
+  commentLoad() {
+    if ( this.state.comments == false ){
+      this.setState({
+        comments: true
+      })
+    }
+    else if ( this.state.comments == true ){
+      this.setState({
+        comments: false
+      })
+    }
   }
   vote(vote) {
     if (vote == -1 && this.state.downVoted == false){
@@ -320,41 +354,94 @@ class BadgeButton extends Component {
         <Card
           title={this.props.title}
           titleStyle={{fontSize: 25, color: '#03A9F4'}}
-          containerStyle={{marginBottom: 15}}
+          containerStyle={{marginBottom: 10,}}
         >
-          <Text h5
-          style={{marginBottom:15 }}
-          >{this.props.content}</Text>
-
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start'}}>
+            <Text
+            style={{fontSize: 16, marginBottom:15, color: '#C0C0C0' }}
+            >{this.props.content}</Text>
+          </View>
+          <Divider style={{ backgroundColor: 'whitesmoke', marginBottom: 15,  }} />
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
             <Button
               icon={{name: 'thumb-up', raised: true }}
-              backgroundColor='#03A9F4'
-              buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+              backgroundColor='#DCDCDC'
+              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.vote(1)}
             />
             <Button
               title={this.state.localUpvotes}
               loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
-              backgroundColor='#f4c703'
-              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+              backgroundColor='#DCDCDC'
+              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.vote(5)}
             />
             <Button
               icon={{name: 'thumb-down'}}
-              backgroundColor='#f44e03'
-              buttonStyle={{width: 100, borderWidth: 0, borderColor: 'transparent', borderRadius: 0}}
+              backgroundColor='#DCDCDC'
+              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.vote(-1)}
             />
+            <Button
+              icon={{name: 'comment'}}
+              backgroundColor='#DCDCDC'
+              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
+              onPress={() => this.commentLoad()}
+            />
           </View>
+          { this.state.comments &&
+            <CommentSection
+              postID={this.props.postID}
+            />
+          }
         </Card>
       </View>
     );
   }
 }
+/**
+ *       </Card>
+ *             <Card>
+ * [CommentSection description]
+ * @extends Component
+ */
+class CommentSection extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      test: 1
+    };
+  }
+  componentWillMount(){
+    console.log("blah")
+  }
+  uploadComment(){
 
+  }
+  render() {
+    return (
+      <View>
+        <Divider style={{ backgroundColor: 'whitesmoke', marginTop: 15,  }} />
+        <AutoGrowingTextInput
+          style={{ color: '#C0C0C0', marginTop: 30 }}
+          placeholder={''}
+          onChangeText={(title) => this.setState({title})}
+        />
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+        <Button
+          title='Post'
+          backgroundColor='#D3D3D3'
+          buttonStyle={{width: 150, borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0, borderRadius: 5}}
+          onPress={ () => this.uploadComment() }
+        />
+        </View>
+      </View>
+    );
+  }
+}
 const styles = StyleSheet.create({
   contentContainer: {
-    paddingVertical: 20
+    backgroundColor: 'whitesmoke'
+    // paddingVertical: 20
   }
 });
