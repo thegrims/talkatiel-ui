@@ -13,8 +13,8 @@
 // ]
 // <AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
 const axios = require("axios");
-const url = "http://aidangrimshaw.pythonanywhere.com/Posts/Top";
-const tempUrl = "http://aidangrimshaw.pythonanywhere.com/Posts/";
+const url = "https://aidangrimshaw.pythonanywhere.com/Posts/Top";
+const tempUrl = "https://aidangrimshaw.pythonanywhere.com/Posts/";
 
 import { StyleSheet, View } from 'react-native';
 import React, { Component } from 'react';
@@ -35,6 +35,7 @@ export default class App extends React.Component {
       this.setState({urlEnd: tempUrl+type})
       this.child.componentDidMount(this.state.urlEnd)
       console.log(this.state.urlEnd+'\n')
+      console.log("blah")
   }
   render() {
     return (
@@ -194,7 +195,7 @@ class CreatePost extends Component {
     console.log(this.state.title)
     axios({
       method: 'post',
-      url: 'http://aidangrimshaw.pythonanywhere.com/Posts',
+      url: 'https://aidangrimshaw.pythonanywhere.com/Posts',
       data: {
         content: this.state.content,
         upvotes: 0,
@@ -243,6 +244,7 @@ class BadgeButton extends Component {
       localUpvotes: this.props.upvotes,
       upVoted: false,
       downVoted: false,
+      postLink: '',
       selectedIndex: 1
     };
   }
@@ -251,27 +253,67 @@ class BadgeButton extends Component {
       this.setState({
         localUpvotes: (parseInt(this.state.localUpvotes)+vote).toString(),
         downVoted: true,
+        upVoted: false,
+        postLink: "https://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/0"
       })
+      axios
+        .post("https://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/0")
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
-    else if (vote == -1 && this.state.downVoted == true){
-      this.setState({
-        localUpvotes: (parseInt(this.state.localUpvotes)-vote).toString(),
-        downVoted: false,
-      })
-    }
+    // else if (vote == -1 && this.state.downVoted == true){
+    //   this.setState({
+    //     localUpvotes: (parseInt(this.state.localUpvotes)-vote).toString(),
+    //     downVoted: false,
+    //     postLink: "http://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/0"
+    //   })
+    // }
     else if (vote == 1 && this.state.upVoted == false){
       this.setState({
         localUpvotes: (parseInt(this.state.localUpvotes)+vote).toString(),
         upVoted: true,
+        downVoted, false,
+        postLink: "https://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/1"
       })
+      axios
+        .post("https://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/1")
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
-    else if (vote == 1 && this.state.upVoted == true){
-      this.setState({
-        localUpvotes: (parseInt(this.state.localUpvotes)-vote).toString(),
-        upVoted: false,
-      })
-    }
+    // else if (vote == 1 && this.state.upVoted == true){
+    //   this.setState({
+    //     localUpvotes: (parseInt(this.state.localUpvotes)-vote).toString(),
+    //     upVoted: false,
+    //     postLink: "http://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/1"
+    //   })
+    // }
+
+    // this.setState({
+    //   postLink: "http://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/1"
+    // })
+    //
+    // console.log(this.state.postLink)
+
     // console.log(this.props.postID)
+  }
+  voteToAPI(){
+    console.log(this.state.postLink)
+    axios
+      .post("https://aidangrimshaw.pythonanywhere.com/Posts/7/1")
+      .then(response => {
+        console.log(response.data)
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
   render() {
     return (

@@ -18,9 +18,9 @@ const url =
 //   });
 
   axios
-    .get("http://aidangrimshaw.pythonanywhere.com/Posts/2/0")
+    .post("https://aidangrimshaw.pythonanywhere.com/Posts/7/0")
     .then(response => {
-      console.log(response.data[i])
+      console.log(response.data)
       // for (i = 0; i < response.data.length; i++){
       //   console.log(response.data[i]);
       //   console.log(response.data[i].content);
