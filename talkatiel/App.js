@@ -35,7 +35,6 @@ export default class App extends React.Component {
       this.setState({urlEnd: tempUrl+type})
       this.child.componentDidMount(this.state.urlEnd)
       console.log(this.state.urlEnd+'\n')
-      console.log("blah")
   }
   render() {
     return (
@@ -135,7 +134,7 @@ class Test extends Component {
     axios
       .get(url)
       .then(response => {
-        for (i = 0; i < response.data.length; i++){
+        for (i = 0; i < 10;/*response.data.length;*/ i++){
           let post = [
             {
               "title" : response.data[i].title,
@@ -272,11 +271,11 @@ class BadgeButton extends Component {
     //     postLink: "http://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/0"
     //   })
     // }
-    else if (vote == 1 && this.state.upVoted == false){
+    if (vote == 1 && this.state.upVoted == false){
       this.setState({
         localUpvotes: (parseInt(this.state.localUpvotes)+vote).toString(),
         upVoted: true,
-        downVoted, false,
+        downVoted: false,
         postLink: "https://aidangrimshaw.pythonanywhere.com/Posts/"+this.props.postID.toString()+"/1"
       })
       axios
