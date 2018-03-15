@@ -1,13 +1,19 @@
-function isBannedWord(userInput){
+export function isBannedWord(userInput){
     var listInput=userInput.toLowerCase().split(" ");
     for(i=0; i < listInput.length; i++) {
-        if(badWords.indexOf(listInput[i]) >= 0){
-            return true; 			
+      console.log(listInput[i])
+      for(j=0; j < badWords.length; j++) {
+        if (listInput[i] === badWords[j]){
+          return true;
         }
+      }
+        // if(badWords.indexOf(listInput[i]) >= 0){
+        //     console.log("blah")
+        //     return true;
+        // }
     }
     return false;
 }
-
 badWords=[
     "ahole",
     "anus",

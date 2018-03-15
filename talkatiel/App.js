@@ -15,6 +15,8 @@ const axios = require("axios");
 const url = "https://aidangrimshaw.pythonanywhere.com/Posts/Top";
 const tempUrl = "https://aidangrimshaw.pythonanywhere.com/Posts/";
 
+import { isBannedWord } from './bannedWordFinder.js'
+
 import { StyleSheet, View } from 'react-native';
 import React, { Component } from 'react';
 import { AppRegistry, Image, TextInput, Alert} from 'react-native';
@@ -270,12 +272,25 @@ class CreatePost extends Component {
         super(props);
         this.state = {
           title: '',
-          content: ''
+          content: '',
+          bannedVisible: false
         };
   }
+  areWordsGood() {
+    if (isBannedWord(this.state.content) == false && isBannedWord(this.state.title) == false){
+      console.log("banned word detected")
+      this.setState({bannedVisible: false})
+      return;
+    }
+  }
   uploadPost() {
-    console.log(this.state.content)
-    console.log(this.state.title)
+    console.log("content: "+this.state.content)
+    // console.log(this.state.title)
+    if (isBannedWord(this.state.content) == true || isBannedWord(this.state.title) == true){
+      console.log("banned word detected")
+      this.setState({bannedVisible: true})
+      return;
+    }
     axios({
       method: 'post',
       url: 'https://aidangrimshaw.pythonanywhere.com/Posts',
@@ -316,7 +331,7 @@ class CreatePost extends Component {
           <AutoGrowingTextInput
             style={{ color: '#C0C0C0', marginTop: 0 }}
             placeholder={''}
-            onChangeText={(title) => this.setState({title})}
+            onChangeText={(content) => this.setState({content})}
           />
 
         </Card>
@@ -324,8 +339,16 @@ class CreatePost extends Component {
           title='Submit'
           backgroundColor='#03A9F4'
           buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-          onPress={ () => uploadPost() }
+          onPress={ () => this.uploadPost() }
         />
+        { this.state.bannedVisible &&
+          <Button
+            title='Please Reconsider Your Word Choice'
+            backgroundColor='#E80000'
+            buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0, marginTop: 15}}
+            onPress={ () => this.areWordsGood() }
+          />
+        }
       </View>
     )
   }
