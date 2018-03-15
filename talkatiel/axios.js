@@ -3,19 +3,19 @@ const axios = require("axios");
 const url =
   "http://aidangrimshaw.pythonanywhere.com/Posts/New";
 
-axios
-  .get(url)
-  .then(response => {
-    for (i = 0; i < response.data.length; i++){
-      console.log(response.data[i]);
-      console.log(response.data[i].content);
-      console.log(response.data[i].upvotes - response.data[i].downvotes);
-      console.log("postID: "+response.data[i].postID);
-    }
-  })
-  .catch(error => {
-    console.log(error);
-  });
+// axios
+//   .get(url)
+//   .then(response => {
+//     for (i = 0; i < response.data.length; i++){
+//       console.log(response.data[i]);
+//       console.log(response.data[i].content);
+//       console.log(response.data[i].upvotes - response.data[i].downvotes);
+//       console.log("postID: "+response.data[i].postID);
+//     }
+//   })
+//   .catch(error => {
+//     console.log(error);
+//   });
 
   // axios
   //   .post("https://aidangrimshaw.pythonanywhere.com/Posts/7/0")
@@ -31,24 +31,39 @@ axios
   //   .catch(error => {
   //     console.log(error);
   //   });
+try {
+  // Send a POST request
+  axios({
+    method: 'post',
+    url: 'http://aidangrimshaw.pythonanywhere.com/Posts/7',
+    data: {
+      content: 'test comment',
+    }
+  });
+  // console.log(response.data)
+}
+catch (err) {
+  console.error(`Error received from axios.post: ${JSON.stringify(err)}`);
+}
+
 
 // try {
 //   // Send a POST request
-  // axios({
-  //   method: 'post',
-  //   url: 'http://aidangrimshaw.pythonanywhere.com/Posts',
-  //   data: {
-  //     content: 'Fred',
-  //     upvotes: 5,
-  //     downvotes: 0,
-  //     postID: 2,
-  //     userID: 1,
-  //     title: 'Aidan'
-  //   }
-  // });
+//   axios({
+//     method: 'post',
+//     url: 'http://aidangrimshaw.pythonanywhere.com/Posts',
+//     data: {
+//       content: 'Fred',
+//       upvotes: 5,
+//       downvotes: 0,
+//       postID: 2,
+//       userID: 1,
+//       title: 'Aidan'
+//     }
+//   });
 // }
 // catch (err) {
-//   // console.error(`Error received from axios.post: ${JSON.stringify(err)}`);
+//   console.error(`Error received from axios.post: ${JSON.stringify(err)}`);
 // }
 
   // {postNames.map(function(name, index){

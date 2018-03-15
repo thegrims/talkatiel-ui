@@ -1,17 +1,16 @@
-// const users = [
-//  {
-//     name: 'brynn',
-//     avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
-//  },
-// ]
-// var post = [
-//   {
-//     title: '',
-//     content: '',
-//     upvotes: ''
-//   },
-// ]
-// <AutoGrowingTextInput style={styles.textInput} placeholder={'Your Message'} />
+const list = [
+  {
+    name: 'Amy Farha',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Vice President'
+  },
+  {
+    name: 'Chris Jackson',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+    subtitle: 'Vice Chairman'
+  },
+]
+
 const axios = require("axios");
 const url = "https://aidangrimshaw.pythonanywhere.com/Posts/Top";
 const tempUrl = "https://aidangrimshaw.pythonanywhere.com/Posts/";
@@ -22,6 +21,7 @@ import { AppRegistry, Image, TextInput, Alert} from 'react-native';
 import { Badge, Text, Button, Card, ButtonGroup, Header, List, ListItem, Input, Divider } from 'react-native-elements'
 import {ScrollView} from 'react-native-gesture-handler';
 import {AutoGrowingTextInput} from 'react-native-autogrow-textinput';
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
 /**
  * [handler description]
@@ -54,7 +54,7 @@ export default class App extends React.Component {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Header
           backgroundColor='#03A9F4'
-          outerContainerStyles={{height: 100, marginBottom: 20}}
+          outerContainerStyles={{height: 100, marginBottom: 15}}
           leftComponent={{
             icon: 'menu',
             color: '#fff',
@@ -115,6 +115,10 @@ export default class App extends React.Component {
     );
   }
 }
+const config = {
+    velocityThreshold: 0.3,
+    directionalOffsetThreshold: 70
+};
 /**
  * [Test description]
  * @extends Component
@@ -123,34 +127,22 @@ class Test extends Component {
   constructor(props) {
         super(props);
         this.state = {
-          list: []
+          list: [],
+          index: 0,
+          max: 10,
         };
-  }
-  render() {
-    var postNames = ['test','firstPost','secondPost']
-    return (
-      <View>
-        {
-          this.renderButtons()
-        }
-        <Button
-          icon={{name: 'refresh'}}
-          backgroundColor='#03A9F4'
-          buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-          onPress={ () => this.componentDidMount(this.props.urlEnd) }
-        />
-      </View>
-    );
   }
   componentDidMount = (urlEnd) => {
     this.setState({
         list: [],
+        index: 0,
     })
     console.log(urlEnd);
     axios
-      .get(url)
+      .get(urlEnd)
       .then(response => {
-        for (i = 0; i < 10;/*response.data.length;*/ i++){
+        this.setState({max: response.data.length,})
+        for (i = 0+this.state.index; i < response.data.length && i < 5+this.state.index;/*10;*/ i++){
           let post = [
             {
               "title" : response.data[i].title,
@@ -169,6 +161,91 @@ class Test extends Component {
     .catch(error => {
       console.log(error);
     });
+  }
+  onSwipeRight(gestureState) {
+    // console.log("right")
+    // console.log(this.state.index)
+    if (this.state.index-5 >= 0){
+      this.setState({
+          list: [],
+          index: this.state.index-5
+      })
+      axios
+        .get(this.props.urlEnd)
+        .then(response => {
+          this.setState({max: response.data.length,})
+          for (i = 0+this.state.index; i < response.data.length && i < 5+this.state.index;/*10;*/ i++){
+            let post = [
+              {
+                "title" : response.data[i].title,
+                "content" : response.data[i].content,
+                "upvotes" : (response.data[i].upvotes - response.data[i].downvotes).toString(),
+                "postID" : response.data[i].postID.toString(),
+              },
+            ];
+            this.setState({
+                list: this.state.list.concat(post),
+            })
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  }
+  onSwipeLeft(gestureState) {
+    // console.log("left")
+    // console.log(this.state.index)
+    if (this.state.index+5 <= this.state.max){
+      this.setState({
+          list: [],
+          index: this.state.index+5
+      })
+      axios
+        .get(this.props.urlEnd)
+        .then(response => {
+          this.setState({max: response.data.length,})
+          for (i = 0+this.state.index; i < response.data.length && i < 5+this.state.index;/*10;*/ i++){
+            let post = [
+              {
+                "title" : response.data[i].title,
+                "content" : response.data[i].content,
+                "upvotes" : (response.data[i].upvotes - response.data[i].downvotes).toString(),
+                "postID" : response.data[i].postID.toString(),
+              },
+            ];
+            this.setState({
+                list: this.state.list.concat(post),
+            })
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  }
+  render() {
+    var postNames = ['test','firstPost','secondPost']
+    return (
+      <View>
+        <GestureRecognizer
+          onSwipeLeft={(state) => this.onSwipeLeft(state)}
+          onSwipeRight={(state) => this.onSwipeRight(state)}
+          config={config}
+        >
+            {
+              this.renderButtons()
+            }
+            <Button
+              icon={{name: 'refresh'}}
+              backgroundColor='#03A9F4'
+              buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+              onPress={ () => this.componentDidMount(this.props.urlEnd) }
+            />
+        </GestureRecognizer>
+
+      </View>
+    );
   }
   renderButtons() {
       return this.state.list.map((item,key) => {
@@ -366,26 +443,26 @@ class BadgeButton extends Component {
             <Button
               icon={{name: 'thumb-up', raised: true }}
               backgroundColor='#DCDCDC'
-              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
+              buttonStyle={{width: 50, marginRight: -3, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.vote(1)}
             />
             <Button
               title={this.state.localUpvotes}
               loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
               backgroundColor='#DCDCDC'
-              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
+              buttonStyle={{width: 50, marginLeft: -3, marginRight: -3, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.vote(5)}
             />
             <Button
               icon={{name: 'thumb-down'}}
               backgroundColor='#DCDCDC'
-              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
+              buttonStyle={{width: 50, marginLeft: -3, marginRight: -3, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.vote(-1)}
             />
             <Button
               icon={{name: 'comment'}}
               backgroundColor='#DCDCDC'
-              buttonStyle={{width: 50, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
+              buttonStyle={{width: 50, marginLeft: -3, borderWidth: 0, borderColor: 'transparent', borderRadius: 5}}
               onPress={() => this.commentLoad()}
             />
           </View>
@@ -399,6 +476,7 @@ class BadgeButton extends Component {
     );
   }
 }
+        // <Divider style={{ backgroundColor: 'whitesmoke', marginTop: 15,  }} />
 /**
  *       </Card>
  *             <Card>
@@ -421,7 +499,19 @@ class CommentSection extends Component {
   render() {
     return (
       <View>
-        <Divider style={{ backgroundColor: 'whitesmoke', marginTop: 15,  }} />
+
+        <List containerStyle={{borderColor: 'whitesmoke'}}>
+        {
+          list.map((l, i) => (
+            <ListItem
+              key={i}
+              title={l.name}
+              titleStyle={{color: '#C0C0C0'}}
+              style={{hideChevron: true,}}
+            />
+          ))
+        }
+        </List>
         <AutoGrowingTextInput
           style={{ color: '#C0C0C0', marginTop: 30 }}
           placeholder={''}
